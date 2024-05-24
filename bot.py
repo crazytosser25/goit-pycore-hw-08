@@ -1,10 +1,22 @@
 """imports"""
 import re
+import sys
 from pathlib import Path
 from app.file import read_file, write_file
 from app.protection import Cipher
 from app.color import check_txt, color, command_help
 
+
+def password_check(database):
+    for attempt in range(3):
+        password = input('Please, enter password to AddressBook: ')
+        cryptograph = Cipher(password)
+        contacts = read_file(database, cryptograph)
+        if contacts != 'wrong pass':
+            return contacts, cryptograph
+        print(f"Incorrect password. {2 - attempt} attempts left.")
+    print("Too many incorrect attempts. Access denied.")
+    return None
 
 def parse_input(user_input: str) -> tuple:
     """Split the user's input into command and arguments.
@@ -25,15 +37,17 @@ def main():
     application that interacts with a contacts database. The user can perform
     actions such as adding, changing, and viewing contact information. The CLI
     uses the 'colorama' module to add colors to the output strings for better
-    readability.
+    readability and Fernet for encrypting file.
     """
     print(check_txt('greeting'))
-
-    password = input('Please, enter password to AddressBook: ')
-    cryptograph = Cipher(password)
-
     database = Path("data/contacts.pkl")
-    contacts = read_file(database, cryptograph)
+    try:
+        contacts, cryptograph = password_check(database)
+    except TypeError:
+        sys.exit()
+    # password = input('Please, enter password to AddressBook: ')
+    # cryptograph = Cipher(password)
+    # contacts = read_file(database, cryptograph)
 
     while True:
         user_input = input(check_txt('placeholder'))
