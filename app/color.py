@@ -21,8 +21,7 @@ def check_txt(arg: str) -> str:
     return output(arg)
 
 def color(args: str, chosen_color: str) -> str:
-    """Function to color text output in color if 'colorama' imported.
-    """
+    """Function to color text output in color if 'colorama' imported."""
     if not COLORAMA:
         return args
     match chosen_color:

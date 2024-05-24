@@ -2,6 +2,7 @@
 import re
 from pathlib import Path
 from app.file import read_file, write_file
+from app.protection import Cipher
 from app.color import check_txt, color, command_help
 
 
@@ -26,10 +27,13 @@ def main():
     uses the 'colorama' module to add colors to the output strings for better
     readability.
     """
-    database = Path("app/contacts.pkl")
-    contacts = read_file(database)
-
     print(check_txt('greeting'))
+
+    password = input('Please, enter password to AddressBook: ')
+    cryptograph = Cipher(password)
+
+    database = Path("data/contacts.pkl")
+    contacts = read_file(database, cryptograph)
 
     while True:
         user_input = input(check_txt('placeholder'))
@@ -37,7 +41,7 @@ def main():
 
         match command:
             case "close" | "exit":
-                write_file(database, contacts)
+                write_file(database, contacts, cryptograph)
                 print(check_txt('bye'))
                 break
             case "hello":
