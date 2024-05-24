@@ -7,15 +7,31 @@ from app.protection import Cipher
 from app.color import check_txt, color, command_help
 
 
-def password_check(database):
+def password_check(database: Path):
+    """ Function to prompt the user for a password and validate it 
+        against the database.
+
+    Args:
+        database (Path): Path to the file containing the encrypted contacts 
+            database.
+
+    Returns:
+        Dict, Cipher: AddressBook instance and the corresponding cipher object 
+            if the password is correct, or None if access is denied
+            after three incorrect attempts.
+    """
     for attempt in range(3):
         password = input('Please, enter password to AddressBook: ')
         cryptograph = Cipher(password)
         contacts = read_file(database, cryptograph)
         if contacts != 'wrong pass':
             return contacts, cryptograph
-        print(f"Incorrect password. {2 - attempt} attempts left.")
-    print("Too many incorrect attempts. Access denied.")
+        print(color(
+            f"Incorrect password. {2 - attempt} attempts left.",
+            'red'),
+            '\n'
+        )
+    print(color("Access denied.", 'red'))
     return None
 
 def parse_input(user_input: str) -> tuple:
@@ -39,15 +55,12 @@ def main():
     uses the 'colorama' module to add colors to the output strings for better
     readability and Fernet for encrypting file.
     """
-    print(check_txt('greeting'))
     database = Path("data/contacts.pkl")
     try:
         contacts, cryptograph = password_check(database)
     except TypeError:
         sys.exit()
-    # password = input('Please, enter password to AddressBook: ')
-    # cryptograph = Cipher(password)
-    # contacts = read_file(database, cryptograph)
+    print(check_txt('greeting'))
 
     while True:
         user_input = input(check_txt('placeholder'))
